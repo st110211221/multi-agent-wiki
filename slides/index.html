@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>從一個人到一個團隊：多代理人 AI 入門</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+:root{--bg:#F6F8FB;--surface:#FFFFFF;--navy:#1E3A5F;--ink:#2A3441;--muted:#6A7686;--line:#E2E8F0;--accent:#2F6FED;
+--accent-bg:#EEF4FF;--green:#23935A;--green-bg:#ECF8F1;--amber:#D99000;--amber-bg:#FFF7E6;--violet:#7C5CD6;--violet-bg:#F5F2FD;
+--font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--shadow:0 1px 2px rgba(30,58,95,.06),0 6px 20px rgba(30,58,95,.08)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font)}
+.deck{position:fixed;inset:0;overflow:hidden}
+.slide{position:absolute;left:50%;top:50%;width:1280px;height:720px;margin:-360px 0 0 -640px;display:none}
+.slide.active{display:block}
+.slide-inner{position:relative;width:100%;height:100%;overflow:hidden;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:44px 68px 76px}
+.slide-top{font-size:18px;color:var(--muted);margin-bottom:6px}
+h1,h2{color:var(--navy);margin:0;line-height:1.3}h2{font-size:48px;padding-left:18px;border-left:9px solid var(--accent)}
+.key{font-size:30px;line-height:1.5;color:var(--ink);background:var(--accent-bg);border-radius:14px;padding:14px 24px;margin:22px 0 26px}
+.body{display:flex;gap:36px;align-items:flex-start}.body.with-visual .points{flex:0 0 55%}.body .visual{flex:1;min-width:0}
+.points{margin:0;padding:0;list-style:none}.points li{position:relative;font-size:28px;line-height:1.5;padding:8px 0 8px 34px}
+.points li::before{content:"";position:absolute;left:4px;top:23px;width:14px;height:14px;border-radius:50%;background:var(--accent)}
+.points strong{color:var(--navy)}
+.refs{position:absolute;left:68px;right:68px;bottom:22px;font-size:17px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.refs a{color:var(--accent);text-decoration:none;margin-right:14px}.refs a:hover{text-decoration:underline}
+.notes{display:none}.show-notes .notes{display:block;position:absolute;right:20px;bottom:56px;max-width:520px;background:#FFFBEA;border:1px solid #F1D98A;border-radius:10px;padding:10px 14px;font-size:15px;line-height:1.6}
+/* 封面 */
+.cover .slide-inner{display:flex;flex-direction:column;justify-content:center;padding:64px 96px 80px;background:linear-gradient(135deg,#fff 60%,var(--accent-bg))}
+.cover h1{font-size:60px}.cover .key{font-size:28px;background:none;padding:0;color:var(--muted)}
+.cover-tag{display:inline-block;align-self:flex-start;background:var(--accent);color:#fff;border-radius:999px;padding:6px 18px;font-size:18px;margin-bottom:22px}
+.cover-meta{list-style:none;padding:0;margin:8px 0 0;font-size:24px;color:var(--ink);line-height:1.8}
+/* 總結 */
+.summary .points li{font-size:30px}
+/* 視覺：compare */
+.v-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmp-col{border-radius:14px;padding:18px 20px;background:var(--bg);border:2px solid var(--line)}
+.cmp-col.cmp-1{background:var(--accent-bg);border-color:var(--accent)}
+.cmp-head{font-size:27px;font-weight:700;color:var(--navy);margin-bottom:10px}.cmp-col p{margin:0;font-size:23px;line-height:1.55}
+/* flow */
+.v-flow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.flow-step{flex:1 1 120px;background:var(--green-bg);border:2px solid var(--green);border-radius:14px;padding:14px 12px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.flow-step b{font-size:25px;color:var(--navy)}.flow-step small{font-size:19px;color:var(--muted);line-height:1.45}
+.flow-no{display:inline-block;margin:0 auto;width:30px;height:30px;line-height:30px;border-radius:50%;background:var(--green);color:#fff;font-weight:700}
+.flow-arrow{align-self:center;font-size:28px;color:var(--green);font-weight:700}
+/* hub */
+.v-hub{display:flex;flex-direction:column;align-items:center}
+.hub-boss{background:var(--navy);color:#fff;border-radius:14px;padding:12px 26px;text-align:center}
+.hub-boss b{font-size:26px;display:block}.hub-boss small{font-size:19px;opacity:.85}
+.hub-lines{display:flex;justify-content:space-around;width:90%;height:34px}.hub-lines span{width:2px;background:var(--accent);opacity:.6}
+.hub-workers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.hub-worker{background:var(--accent-bg);border:2px solid var(--accent);border-radius:12px;padding:10px;text-align:center}
+.hub-worker b{display:block;font-size:23px;color:var(--navy)}.hub-worker small{font-size:18px;color:var(--muted)}
+/* debate */
+.deb-agents{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.deb-agent{background:var(--violet-bg);border:2px solid var(--violet);border-radius:14px;padding:12px;text-align:center}
+.deb-face{display:inline-block;width:36px;height:36px;line-height:36px;border-radius:50%;background:var(--violet);color:#fff;font-weight:700;margin-bottom:6px}
+.deb-agent b{display:block;font-size:23px;color:var(--navy)}.deb-agent small{font-size:18px;color:var(--muted);line-height:1.4}
+.deb-loop{margin-top:16px;text-align:center;font-size:22px;color:var(--violet);font-weight:700;border:2px dashed var(--violet);border-radius:999px;padding:8px}
+/* pair */
+.v-pair{display:flex;align-items:center;gap:10px}
+.pair-role{flex:1;background:var(--amber-bg);border:2px solid var(--amber);border-radius:14px;padding:16px;text-align:center}
+.pair-role b{display:block;font-size:24px;color:var(--navy)}.pair-role small{font-size:19px;color:var(--muted);line-height:1.45}
+.pair-talk{display:flex;flex-direction:column;gap:8px;font-size:20px;color:var(--amber);font-weight:700;white-space:nowrap}
+/* bars */
+.v-bars{background:var(--bg);border-radius:14px;padding:20px 22px}.bar-title{font-size:21px;color:var(--muted);margin-bottom:12px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 96px;gap:12px;align-items:center;margin:14px 0}
+.bar-label{font-size:22px;color:var(--navy);font-weight:700}.bar-val{font-size:22px;text-align:right;font-variant-numeric:tabular-nums}
+.bar-track{height:28px;background:#fff;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar-fill{display:block;height:100%;width:var(--w);background:var(--accent);border-radius:999px}
+/* 控制列 */
+.controls{position:fixed;right:18px;bottom:8px;display:flex;gap:8px;z-index:5}
+.controls button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:4px 14px;font-size:16px;cursor:pointer;color:var(--navy)}
+.progress{position:fixed;left:0;top:0;height:4px;background:var(--accent);transition:width .2s;z-index:5}
+.hint{position:fixed;left:18px;bottom:12px;font-size:13px;color:var(--muted)}
+/* 窄螢幕：改成可上下捲動的卡片 */
+.narrow .deck{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.narrow .slide{position:static;width:auto;height:auto;margin:12px}
+.narrow .slide-inner{height:auto;min-height:calc(100vh - 80px);padding:22px 18px 70px;border-radius:14px}
+.narrow h2{font-size:26px;border-left-width:6px;padding-left:10px}.narrow .cover h1{font-size:32px}
+.narrow .key{font-size:18px;padding:10px 14px;margin:14px 0}.narrow .cover .key{font-size:18px}
+.narrow .body{flex-direction:column;gap:16px}.narrow .body.with-visual .points{flex:none}
+.narrow .points li{font-size:17px;padding-left:24px}.narrow .points li::before{top:15px;width:10px;height:10px}
+.narrow .cmp-head{font-size:19px}.narrow .cmp-col p,.narrow .flow-step small,.narrow .pair-role small{font-size:15px}.narrow .flow-step b,.narrow .pair-role b,.narrow .hub-worker b,.narrow .deb-agent b{font-size:18px}.narrow .hub-boss b{font-size:19px}.narrow .deb-loop{font-size:16px}
+.narrow .refs{position:static;margin-top:20px;font-size:13px}.narrow .slide-inner{padding-bottom:24px}.narrow .cover .slide-inner{padding:30px 22px 70px}
+.narrow .cover-meta{font-size:16px}.narrow .cover-tag{font-size:14px}
+.narrow .v-compare,.narrow .deb-agents,.narrow .hub-workers{grid-template-columns:1fr}
+.narrow .v-flow{flex-direction:column}.narrow .flow-arrow{transform:rotate(90deg)}
+.narrow .v-pair{flex-direction:column}.narrow .bar-row{grid-template-columns:96px 1fr 60px}.narrow .bar-label,.narrow .bar-val{font-size:14px}
+.narrow .hint{display:none}
+</style>
+</head>
+<body>
+<!-- 本檔由 tools/build_slides.py 從 slides/drafts/*.md 產生，請勿手改 -->
+<div class="progress"></div>
+<main class="deck">
+<section class="slide cover" data-no="01"><div class="slide-inner"><div class="cover-tag">教學簡報・以 LLM Wiki 為知識來源</div><h1>從一個人到一個團隊：多代理人 AI 入門</h1><p class="key">當 AI 不只一個，它們怎麼分工、合作，又會怎麼出包？</p><ul class="cover-meta"><li>主題：多個 AI 怎麼分工合作</li><li>知識來源：本專案的 LLM Wiki</li></ul><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/index.md" target="_blank" rel="noopener">Wiki 目錄｜多代理人 AI</a></footer><aside class="notes">開場：大家都用過 ChatGPT，今天要談的是「很多個 AI 一起工作」。</aside></div></section>
+<section class="slide content" data-no="02"><div class="slide-inner"><div class="slide-top"><span class="slide-no">02 / 12</span></div><h2>你現在用的 AI：一個萬能助理</h2><p class="key">用 ChatGPT 時，通常是你一步步在引導</p><div class="body text-only"><ul class="points"><li>你問一句、它答一句，方向全靠你掌舵</li><li>聊天 AI 很會解題，但很依賴人類一步步引導</li><li>非專家常常不知道 prompt（給 AI 的指令）該怎麼寫</li><li>那如果讓 AI 自己跟 AI 對話呢？</li></ul></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/camel.md" target="_blank" rel="noopener">CAMEL：讓兩個 AI 用角色扮演合作</a></footer><aside class="notes">先讓觀眾意識到：平常的 AI 使用方式，是「你」在當指揮。</aside></div></section>
+<section class="slide content" data-no="03"><div class="slide-inner"><div class="slide-top"><span class="slide-no">03 / 12</span></div><h2>多代理人系統是什麼？</h2><p class="key">多個 AI 各負責一部分，互相傳訊息完成同一件事</p><div class="body with-visual"><ul class="points"><li>每個 AI 叫一個代理人（agent）</li><li>像專案小組：有人規劃、有人動手做</li><li>你只要在一開始把目標交代清楚</li><li>代理人可以是不同角色，也可以是同一模型的分身</li></ul><div class=visual><div class="v-compare"><div class="cmp-col cmp-0"><div class="cmp-head">一個人（萬能助理）</div><p>你一步步下指令，它一次回答一題</p></div><div class="cmp-col cmp-1"><div class="cmp-head">一個團隊（多代理人）</div><p>角色分工、互相交代工作，自己往目標推進</p></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a></footer><aside class="notes">這頁是整份簡報的主線：從一個人，到一個團隊。</aside></div></section>
+<section class="slide content" data-no="04"><div class="slide-inner"><div class="slide-top"><span class="slide-no">04 / 12</span></div><h2>第一步：先發角色卡</h2><p class="key">用 prompt 替每個 AI 指定身分和職責</p><div class="body with-visual"><ul class="points"><li>例：交易員提需求、程式設計師寫程式</li><li>角色卡寫明：不准互換角色、一次一個指令</li><li>ChatDev 拿掉角色設定，程式可執行率 0.88 → 0.58</li><li>給辯論中的 AI 不同人設，MMLU 正確率 71.1 → 74.2</li></ul><div class=visual><div class="v-pair"><div class="pair-role"><b>AI 使用者（交易員）</b><small>負責規劃，一次給一個指令</small></div><div class="pair-talk" aria-hidden="true"><span>指令 →</span><span>← 解法</span></div><div class="pair-role"><b>AI 助理（程式設計師）</b><small>負責執行，回覆解法</small></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/role-playing.md" target="_blank" rel="noopener">角色扮演</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/camel.md" target="_blank" rel="noopener">CAMEL：讓兩個 AI 用角色扮演合作</a></footer><aside class="notes">CAMEL 的例子：只在開頭寫好角色，之後兩個 AI 自己聊到做完。</aside></div></section>
+<section class="slide content" data-no="05"><div class="slide-inner"><div class="slide-top"><span class="slide-no">05 / 12</span></div><h2>合作方式①：分工接力</h2><p class="key">把大任務切成小任務，一棒交給下一棒</p><div class="body with-visual"><ul class="points"><li>ChatDev：一間全是 AI 的軟體公司</li><li>依序經過設計、寫程式、測試三個階段</li><li>每個小任務只讓兩個角色對話到有共識</li><li>交接只傳「結論」，不傳整段對話</li></ul><div class=visual><div class="v-flow"><div class="flow-step"><span class="flow-no">1</span><b>設計</b><small>討論目標使用者、資料管理、介面</small></div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-step"><span class="flow-no">2</span><b>寫程式</b><small>撰寫、補完程式碼</small></div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-step"><span class="flow-no">3</span><b>測試</b><small>審查程式碼、實際執行</small></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/division-of-labor.md" target="_blank" rel="noopener">分工流水線</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/chatdev.md" target="_blank" rel="noopener">ChatDev：一間全是 AI 的軟體公司</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/memory.md" target="_blank" rel="noopener">記憶</a></footer><aside class="notes">像分組報告：找資料、寫稿、做投影片、校對，一站接一站。</aside></div></section>
+<section class="slide content" data-no="06"><div class="slide-inner"><div class="slide-top"><span class="slide-no">06 / 12</span></div><h2>合作方式②：互相辯論</h2><p class="key">各自作答、互相挑錯，來回幾輪後更正確</p><div class="body with-visual"><ul class="points"><li>像考完試和同學對答案，錯的地方再改</li><li>3 個 AI 辯論 2 輪，數學題（GSM8K）正確率 77% → 85%</li><li>同一組題目，多數決是 81%，辯論更好</li><li>但大家可能一起自信地附和錯答案</li></ul><div class=visual><div class="v-debate"><div class="deb-agents"><div class="deb-agent"><span class="deb-face">1</span><b>AI 甲</b><small>各自先作答</small></div><div class="deb-agent"><span class="deb-face">2</span><b>AI 乙</b><small>讀其他人的答案</small></div><div class="deb-agent"><span class="deb-face">3</span><b>AI 丙</b><small>修正後再交出</small></div></div><div class="deb-loop">⇄ 互相看答案、挑錯、修正，來回幾輪</div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/debate.md" target="_blank" rel="noopener">辯論</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/debate.md" target="_blank" rel="noopener">多代理人辯論：讓 AI 互相吵出更好的答案</a></footer><aside class="notes">重點不是少數服從多數，而是在討論中把錯的想法修掉。</aside></div></section>
+<section class="slide content" data-no="07"><div class="slide-inner"><div class="slide-top"><span class="slide-no">07 / 12</span></div><h2>合作方式③：主管帶助手</h2><p class="key">主管拆解分派，助手平行執行，主管整合</p><div class="body with-visual"><ul class="points"><li>Claude 的研究功能就是這樣做的</li><li>助手各看自己那一塊，只交回重點</li><li>分派要講清楚目標與範圍，不然會重工</li><li>Anthropic 內部評測：比單一 AI 好 90.2%</li></ul><div class=visual><div class="v-hub"><div class="hub-boss"><b>主管 AI</b><small>擬定策略、分派、整合</small></div><div class="hub-lines" aria-hidden="true"><span></span><span></span><span></span></div><div class="hub-workers"><div class="hub-worker"><b>助手 A</b><small>查方向一</small></div><div class="hub-worker"><b>助手 B</b><small>查方向二</small></div><div class="hub-worker"><b>助手 C</b><small>查方向三</small></div></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/orchestrator-worker.md" target="_blank" rel="noopener">主管－助手架構</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/anthropic-research.md" target="_blank" rel="noopener">Anthropic 多代理人研究系統：一個主管帶一群助手</a></footer><aside class="notes">像分組報告的組長：分好方向給組員同時查，再拼成一份。</aside></div></section>
+<section class="slide content" data-no="08"><div class="slide-inner"><div class="slide-top"><span class="slide-no">08 / 12</span></div><h2>番外：一群 AI 自己形成小社會</h2><p class="key">沒寫劇本，互動中自己長出傳消息、辦派對等行為</p><div class="body with-visual"><ul class="points"><li>Generative Agents 研究：25 個 AI 居民住在虛擬小鎮</li><li>開頭只設定兩件事：有人想辦派對、有人暗戀某人</li><li>12 位受邀者中有 5 位真的到場</li><li>靠記憶、反思、規劃，才能長期像真人</li></ul><div class=visual><div class="v-bars"><div class="bar-title">知道派對的居民比例</div><div class="bar-row"><span class="bar-label">一開始</span><span class="bar-track"><span class="bar-fill" style="--w:4.00%"></span></span><span class="bar-val">4%</span></div><div class="bar-row"><span class="bar-label">兩天後</span><span class="bar-track"><span class="bar-fill" style="--w:52.00%"></span></span><span class="bar-val">52%</span></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/emergent-behavior.md" target="_blank" rel="noopener">湧現的社會行為</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/generative-agents.md" target="_blank" rel="noopener">Generative Agents：25 個 AI 居民的虛擬小鎮</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/memory.md" target="_blank" rel="noopener">記憶</a></footer><aside class="notes">多代理人不只能「做工作」，也能模擬一群人怎麼互動。</aside></div></section>
+<section class="slide content" data-no="09"><div class="slide-inner"><div class="slide-top"><span class="slide-no">09 / 12</span></div><h2>它真的比單一 AI 強嗎？</h2><p class="key">看任務而定，而且通常比較花錢</p><div class="body with-visual"><ul class="points"><li>兩篇的條件不同：任務種類、量法不一樣</li><li>token＝AI 計算文字量的單位，用越多越花錢</li><li>Anthropic：多代理人的 token 用量約是聊天的 15 倍</li><li>適合能平行、資訊量超過單一 AI 能讀範圍的任務</li></ul><div class=visual><div class="v-compare"><div class="cmp-col cmp-0"><div class="cmp-head">Anthropic 研究系統</div><p>研究型問題，比單一 AI 好 90.2%</p></div><div class="cmp-col cmp-1"><div class="cmp-head">多代理人為何失敗</div><p>7 個框架、多種測驗，進步常常很小</p></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/cost-and-fit.md" target="_blank" rel="noopener">成本與適用時機</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/glossary.md" target="_blank" rel="noopener">名詞表</a></footer><aside class="notes">Wiki 在這裡標了「說法不同」，簡報也兩邊都呈現，不替觀眾下結論。</aside></div></section>
+<section class="slide content" data-no="10"><div class="slide-inner"><div class="slide-top"><span class="slide-no">10 / 12</span></div><h2>多代理人會在哪裡出錯？</h2><p class="key">規格不清、彼此沒對齊、沒檢查好，是三大類原因</p><div class="body with-visual"><ul class="points"><li>研究者讀了 200 條執行紀錄，整理出 14 種失敗</li><li>最常見：一直重複同樣的步驟（17.14%）</li><li>也有角色反轉、說「我會做」卻沒做</li><li>很多是設計問題，不只是模型不夠聰明</li></ul><div class=visual><div class="v-bars"><div class="bar-title">失敗原因分布</div><div class="bar-row"><span class="bar-label">規格問題</span><span class="bar-track"><span class="bar-fill" style="--w:41.77%"></span></span><span class="bar-val">41.77%</span></div><div class="bar-row"><span class="bar-label">彼此沒對齊</span><span class="bar-track"><span class="bar-fill" style="--w:36.94%"></span></span><span class="bar-val">36.94%</span></div><div class="bar-row"><span class="bar-label">驗證問題</span><span class="bar-track"><span class="bar-fill" style="--w:21.30%"></span></span><span class="bar-val">21.30%</span></div></div></div></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/failure-modes.md" target="_blank" rel="noopener">多代理人的常見失敗</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/mas-failures.md" target="_blank" rel="noopener">多代理人為何失敗：14 種失敗模式</a></footer><aside class="notes">這三類失敗，正好對應專案小組常見的問題：需求不清、溝通不良、沒有驗收。</aside></div></section>
+<section class="slide content" data-no="11"><div class="slide-inner"><div class="slide-top"><span class="slide-no">11 / 12</span></div><h2>怎麼讓 AI 團隊少出錯？</h2><p class="key">角色寫清楚、加上檢查關卡、設好停止條件</p><div class="body text-only"><ul class="points"><li>ChatDev 把角色規格寫清楚：成功率 +9.4%</li><li>ChatDev 加一關檢查整體目標：成功率 +15.6%</li><li>檢查要多層，不能只做表面檢查</li><li>設停止條件：例如 CAMEL 的訊息上限 40 則</li><li>這些方法有幫助，但沒有消除所有失敗</li></ul></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/role-playing.md" target="_blank" rel="noopener">角色扮演</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/cross-checking.md" target="_blank" rel="noopener">互相檢查</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/termination.md" target="_blank" rel="noopener">停止條件</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/sources/mas-failures.md" target="_blank" rel="noopener">多代理人為何失敗：14 種失敗模式</a></footer><aside class="notes">這些改進有幫助，但研究也指出沒有辦法消除所有失敗。</aside></div></section>
+<section class="slide summary" data-no="12"><div class="slide-inner"><div class="slide-top"><span class="slide-no">12 / 12</span></div><h2>總結：從一個人到一個團隊</h2><p class="key">分工合作能變強，但要付出成本，也要防出錯</p><div class="body text-only"><ul class="points"><li>多代理人＝一群有角色的 AI 互相傳訊息合作</li><li>常見合作：分工接力、互相辯論、主管帶助手</li><li>強不強看任務，而且比較花錢</li><li>常見出錯：規格不清、沒對齊、沒檢查好</li></ul></div><footer class="refs">Wiki 出處：<a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/multi-agent-system.md" target="_blank" rel="noopener">多代理人系統</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/cost-and-fit.md" target="_blank" rel="noopener">成本與適用時機</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/failure-modes.md" target="_blank" rel="noopener">多代理人的常見失敗</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/division-of-labor.md" target="_blank" rel="noopener">分工流水線</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/debate.md" target="_blank" rel="noopener">辯論</a><a href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/concepts/orchestrator-worker.md" target="_blank" rel="noopener">主管－助手架構</a></footer><aside class="notes">回到開頭：從「你指揮一個 AI」，到「設計一個 AI 團隊」。</aside></div></section>
+</main>
+<div class="controls"><button id="prev" aria-label="上一頁">←</button><button id="next" aria-label="下一頁">→</button></div>
+<div class="hint">← → 翻頁・N 顯示講者備註</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),cur=0,bar=document.querySelector('.progress');
+  function mode(){var n=innerWidth<760||innerWidth<innerHeight;document.body.classList.toggle('narrow',n);
+    slides.forEach(function(s){s.style.transform=n?'':'scale('+Math.min((innerWidth-32)/1280,(innerHeight-88)/720)+')';s.style.marginTop=n?'':'-388px';});}
+  function show(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach(function(s,k){s.classList.toggle('active',k===cur);});
+    bar.style.width=((cur+1)/slides.length*100)+'%';if(location.hash!=='#'+(cur+1))history.replaceState(null,'','#'+(cur+1));
+    var d=document.querySelector('.deck');if(d)d.scrollTop=0;}
+  window.deck={show:show,get index(){return cur},get total(){return slides.length}};
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();show(cur+1);}
+    else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();show(cur-1);}
+    else if(e.key==='n'||e.key==='N'){document.body.classList.toggle('show-notes');}});
+  document.getElementById('prev').onclick=function(){show(cur-1)};document.getElementById('next').onclick=function(){show(cur+1)};
+  var x0=null;document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>60)show(cur+(dx<0?1:-1));x0=null;},{passive:true});
+  addEventListener('resize',mode);mode();show((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>

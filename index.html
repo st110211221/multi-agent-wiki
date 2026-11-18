@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多代理人 AI｜LLM Wiki＋教學簡報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+:root{--bg:#F6F8FB;--surface:#fff;--navy:#1E3A5F;--ink:#2A3441;--muted:#6A7686;--line:#E2E8F0;--accent:#2F6FED;--accent-bg:#EEF4FF}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.75}
+main{max-width:860px;margin:0 auto;padding:48px 20px 64px}h1{color:var(--navy);font-size:2rem;margin:.2em 0}
+.tag{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:2px 14px;font-size:.85rem}
+.lead{color:var(--muted);font-size:1.08rem}.cta{display:inline-block;margin:18px 0 8px;background:var(--accent);color:#fff;text-decoration:none;border-radius:12px;padding:12px 26px;font-weight:700;font-size:1.1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:26px}
+.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;color:var(--ink);text-decoration:none;box-shadow:0 1px 2px rgba(30,58,95,.06),0 4px 16px rgba(30,58,95,.06)}
+.card:hover{border-color:var(--accent)}.card b{color:var(--navy);display:block;margin-bottom:4px}.card small{color:var(--muted)}
+h2{color:var(--navy);font-size:1.25rem;margin-top:40px;border-left:5px solid var(--accent);padding-left:10px}
+ol{padding-left:1.3em}footer{color:var(--muted);font-size:.85rem;margin-top:40px}
+</style>
+</head>
+<body><main>
+<span class="tag">生成式 AI 第十週作業</span>
+<h1>多代理人 AI：從 LLM Wiki 到教學簡報</h1>
+<p class="lead">先建立一個收錄 6 篇資料的 LLM Wiki，再只用 Wiki 當知識來源，透過有檢查關卡的流程做出一份給「用過 ChatGPT 的大學生」看的教學簡報。</p>
+<a class="cta" href="slides/">開啟教學簡報 →</a>
+<div class="grid">
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/wiki/index.md"><b>LLM Wiki</b><small>6 篇來源頁、11 篇概念頁、名詞表</small></a>
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/docs/workflow.md"><b>流程設計（loop／graph）</b><small>v2 流程圖、檢查關卡、停止條件</small></a>
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/docs/run-1.md"><b>執行紀錄 run-1</b><small>流程 v1 的實際執行與檢查結果</small></a>
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/docs/run-2.md"><b>執行紀錄 run-2</b><small>改成 v2 後再跑一次，與 run-1 比較</small></a>
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/docs/reflection.md"><b>反思</b><small>哪個節點最常出錯、檢查往前移到哪</small></a>
+<a class="card" href="https://github.com/st110211221/multi-agent-wiki/blob/main/docs/01-discussion.md"><b>先討論：訪談紀錄</b><small>建 Wiki 前的 9 個問題</small></a>
+</div>
+<h2>流程一覽（v2）</h2>
+<ol>
+<li>⓪ Wiki 健檢 → ① 查詢 Wiki → ② 寫大綱（每頁列出要用的事實）</li>
+<li>③ 大綱檢查：事實真的在 Wiki 裡？缺資料就回 Wiki 補</li>
+<li>④ 人工關卡：使用者審核大綱</li>
+<li>⑤ 逐頁生成 ⇄ ⑥ 逐頁檢查（自動＋審稿），沒過只重做那一頁，最多 2 次</li>
+<li>⑦ 程式組成 HTML → ⑧ 成品檢查（自動量測＋看截圖）→ ⑨ 寫紀錄</li>
+</ol>
+<footer>repo：<a href="https://github.com/st110211221/multi-agent-wiki">st110211221/multi-agent-wiki</a></footer>
+</main></body></html>
